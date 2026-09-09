@@ -10,5 +10,6 @@ namespace CMP.Scripts.AiStates
         protected GhostBlackboard GhostBlackboard;
         public abstract void OnEnter();
         public abstract void Update();
+        public virtual void OnExit() { } 
     }
 }
