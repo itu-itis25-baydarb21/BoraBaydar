@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using CMP.Scripts.Helper;
 using UnityEngine;
 
@@ -17,14 +18,25 @@ namespace CMP.Scripts
         private InputManager _inputManager;
         private GameMode _gameMode = GameMode.Scatter;
         private readonly List<Ghost> _ghosts = new();
-
+        private List<Vector2Int> _ghostSpawnPoints;
+        [SerializeField]private GridData gridData;
+        private List<Vector2Int> _pacmanSpawnPoint;
         private void Start()
         {
             var gridData = AssetDatabase.Instance.GridData;
             _pacman = Instantiate(AssetDatabase.Instance.PacmanPrefab);
             _inputManager = Instantiate(AssetDatabase.Instance.InputManagerPrefab);
+            for(int i = 0; i < GameSettings.AiCharacterCount; i++)
+            {
+                Ghost newGhost = Instantiate(AssetDatabase.Instance.Ghost);
+                _ghosts.Add(newGhost);
+            }
             CreateBackground(gridData);
             AdjustCamera(gridData);
+            GetGhostSpawnPoints();
+            AdjustGhostSpawnPoints();
+            GetPacmanSpawnPoint();
+            AdjustPacmanSpawnPoint();
         }
 
         private void CreateBackground(GridData gridData)
@@ -44,6 +56,31 @@ namespace CMP.Scripts
             var mainCamera = Camera.main;
             mainCamera.orthographicSize = gridData.Height + GameSettings.CameraPadding;
             mainCamera.transform.position = new Vector3(gridData.Width / 2f - 0.5f, 0f, -10f);
+        }
+
+        private void GetGhostSpawnPoints()
+        {
+            _ghostSpawnPoints =  gridData.GetCoordsOfCellType(CellType.AiSpawnZone);    
+            Debug.Log(_ghostSpawnPoints);   
+        }
+        
+        private void AdjustGhostSpawnPoints()
+        {
+            for(int i = 0; i < _ghostSpawnPoints.Count; i++)
+            {
+                _ghosts[i].transform.position = (Vector3)(Vector2)_ghostSpawnPoints[i];
+                Debug.Log(_ghosts[i].transform.position);
+            }
+        }
+
+        private void GetPacmanSpawnPoint()
+        {
+            _pacmanSpawnPoint = gridData.GetCoordsOfCellType(CellType.Pacman);
+        }
+
+        private void AdjustPacmanSpawnPoint()
+        {
+            _pacman.transform.position = (Vector3)(Vector2)_pacmanSpawnPoint[0];
         }
     }
 }
