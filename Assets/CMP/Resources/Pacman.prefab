@@ -151,4 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df237692d9934ea58112c2e39ef29f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InputManager: {fileID: 0}
   Animator: {fileID: 8553525815565296724}
+  Speed: 5
+  pacmanVisual: {fileID: 1707388895194639311}
+  gridData: {fileID: 11400000, guid: 54774b2e8339a4bebb87909d0f2c5424, type: 2}
