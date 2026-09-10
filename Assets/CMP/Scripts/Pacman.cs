@@ -10,6 +10,7 @@ namespace CMP.Scripts
         private Direction _currentMoveDirection = Direction.None;
         private Direction _desiredMoveDirection = Direction.None;
         public Animator Animator;
+        public const string FailTriggerName = "Fail";
         private const string FailAnimationName = "FailAnimation";
         public float Speed = 5f;
         [SerializeField] private GameObject pacmanVisual;
@@ -47,6 +48,16 @@ namespace CMP.Scripts
             _notMoveableCellCords.AddRange(gridData.GetCoordsOfCellType(CellType.Wall));
             _notMoveableCellCords.AddRange(gridData.GetCoordsOfCellType(CellType.AiSpawnZone));
             _notMoveableCellCords.AddRange(gridData.GetCoordsOfCellType(CellType.AiGate));
+        }
+
+        public void PlayFailAnimation()
+        {
+            this.enabled = false;
+
+            if(Animator != null)
+            {
+                Animator.SetTrigger(FailTriggerName);
+            }
         }
 
         private void UpdateFacingDirection() 
