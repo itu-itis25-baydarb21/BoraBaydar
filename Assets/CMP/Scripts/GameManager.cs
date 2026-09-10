@@ -136,7 +136,7 @@ namespace CMP.Scripts
 
             if (_pacman != null)
             {
-                _pacman.enabled = false;
+                _pacman.PlayFailAnimation();
             }
 
             if (_inputManager != null)
