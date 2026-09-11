@@ -54,6 +54,11 @@ namespace CMP.Scripts
         {
             this.enabled = false;
 
+            if(AudioManager.Instance != null)
+            {
+                AudioManager.Instance.StopWaka();
+            }
+
             if(Animator != null)
             {
                 Animator.SetTrigger(FailTriggerName);
@@ -113,7 +118,7 @@ namespace CMP.Scripts
                     Vector2Int currentVector = _currentMoveDirection.ToVector2Int();
                     Vector2Int currentNextCell = pos + currentVector;
                     
-                    bool isCurrentValid = currentNextCell.x >= 0 && currentNextCell.x < gridData.Width &&  currentNextCell.y >= 0 && currentNextCell.y < gridData.Height && !_notMovableCellCordsSet.Contains(currentNextCell);
+                    bool isCurrentValid = currentNextCell.x >= 0 && currentNextCell.x < gridData.Width && currentNextCell.y >= 0 && currentNextCell.y < gridData.Height && !_notMovableCellCordsSet.Contains(currentNextCell);
 
                     if (isCurrentValid)
                     {
@@ -122,12 +127,29 @@ namespace CMP.Scripts
                     else
                     {
                         _targetPosition = pos; 
+                        _currentMoveDirection = Direction.None;
                     }
                 }
                 finalTargetPosition = (Vector3)(Vector2)_targetPosition;
             }
 
+            Vector3 prevPosition = transform.position;
+
             transform.position = Vector3.MoveTowards(transform.position, finalTargetPosition, Speed * Time.deltaTime);
+
+            bool isActuallyMoving = (transform.position - prevPosition).sqrMagnitude > 0.00001f;
+
+            if(AudioManager.Instance != null)
+            {
+                if(isActuallyMoving)
+                {
+                    AudioManager.Instance.StartWaka();
+                }
+                else
+                {
+                    AudioManager.Instance.StopWaka();
+                }
+            }
         }
     }
 }
