@@ -47,3 +47,6 @@ Assets/
 │   ├── GhostBlackboard.cs          # Shared state context and dependencies
 │   └── Pacman.cs                   # Input, grid traversal, animator control
 └── Audio/                          # Low-latency 16-bit PCM sound effects
+
+## 📱 Download APK
+You can download the latest Android build directly from the [Releases Page](https://github.com/itu-itis-baydarb21/BoraBaydar/releases/latest).
