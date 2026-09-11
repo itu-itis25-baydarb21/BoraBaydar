@@ -6,8 +6,8 @@ A modern 2D Pac-Man recreation built in Unity, focusing on clean code architectu
 
 ## 📱 Download APK
 
-* ⬇️ **[Download BoraBaydarAgaveCase.apk](https://github.com/itu-itis-baydarb21/BoraBaydar/releases/latest/download/BoraBaydarAgaveCase.apk)**
-* 📦 **[View Release Notes (Pac-man Case Android v1.0)](https://github.com/itu-itis-baydarb21/BoraBaydar/releases/latest)**
+* ⬇️ **[Download BoraBaydarAgaveCase.apk](https://github.com/itu-itis25-baydarb21/BoraBaydar/releases/latest/download/BoraBaydarAgaveCase.apk)**
+* 📦 **[View Release Notes (Pac-man Case Android v1.0)](https://github.com/itu-itis25-baydarb21/BoraBaydar/releases/latest)**
 
 ---
 
