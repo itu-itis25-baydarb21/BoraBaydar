@@ -194,5 +194,29 @@ namespace CMP.Scripts
             Scene activeScene = SceneManager.GetActiveScene();
             SceneManager.LoadScene(activeScene.buildIndex);
         }
+
+        public void CheckAndResetToScatter()
+        {
+            if (_gameMode != GameMode.Chase) return;
+
+            bool anyGhostStillChasing = false;
+            foreach (var ghost in _ghosts)
+            {
+                if (ghost != null && ghost.CurrentState is ChaseState)
+                {
+                    anyGhostStillChasing = true;
+                    break;
+                }
+            }
+
+            if (!anyGhostStillChasing)
+            {
+                _gameMode = GameMode.Scatter;
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySiren(false);
+                }
+            }
+        }
     }
 }
