@@ -6,14 +6,6 @@ using GhostStateBase = CMP.Scripts.AiStates.GhostState;
 
 namespace CMP.Scripts
 {
-    public enum GhostState
-    {
-        InHouse,
-        JoiningGame,
-        Scatter,
-        Chase,
-    }
-
     public class Ghost : MonoBehaviour
     {
         public GameObject LeftEye;
@@ -33,7 +25,7 @@ namespace CMP.Scripts
                 PacmanTransform = pacmanTransform,
                 GameManager = gameManager,
                 JoinDelay = joinDelay,
-                Speed = 3f,
+                Speed = 1f / GameSettings.AiMovementDuration,
                 CurrentGridPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y)),
                 TargetGridPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y))
             };
@@ -45,6 +37,7 @@ namespace CMP.Scripts
         public void Update()
         {
             CurrentState?.Update();
+            UpdateEyeDirection();
         }
 
         public void ChangeState(GhostStateBase newState)
@@ -52,6 +45,26 @@ namespace CMP.Scripts
             CurrentState?.OnExit();
             CurrentState = newState;
             CurrentState?.OnEnter();
+        }
+
+        private void UpdateEyeDirection()
+        {
+            if (Blackboard == null || (LeftEye == null && RightEye == null)) return;
+
+            Vector2Int dir = Blackboard.GridDirection;
+            if (dir == Vector2Int.zero) return;
+
+            float targetZAngle = 0f;
+
+            if (dir == Vector2Int.up) targetZAngle = 0f;
+            else if (dir == Vector2Int.left) targetZAngle = 90f;
+            else if (dir == Vector2Int.down) targetZAngle = 180f;
+            else if (dir == Vector2Int.right) targetZAngle = -90f;
+
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetZAngle);
+
+            if (LeftEye != null) LeftEye.transform.localRotation = targetRotation;
+            if (RightEye != null) RightEye.transform.localRotation = targetRotation;
         }
     }
 }

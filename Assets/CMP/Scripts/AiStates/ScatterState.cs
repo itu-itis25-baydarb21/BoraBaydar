@@ -9,16 +9,7 @@ namespace CMP.Scripts.AiStates
         private Vector2Int _targetTile;
         private Vector2Int _currentDirection = Vector2Int.zero;
 
-        private const float SightDistance = 6f; 
-        private const float ArrivedTolerance = 0.02f;
 
-        private static readonly Vector2Int[] PossibleDirections = new[]
-        {
-            Vector2Int.up,
-            Vector2Int.down,
-            Vector2Int.left,
-            Vector2Int.right
-        };
 
         public ScatterState(GhostBlackboard blackboard) : base(blackboard) { }
 
@@ -42,7 +33,7 @@ namespace CMP.Scripts.AiStates
                 GhostBlackboard.Speed * Time.deltaTime
             );
 
-            if (Vector3.Distance(GhostBlackboard.GhostTransform.position, targetWorldPos) <= ArrivedTolerance)
+            if (Vector3.Distance(GhostBlackboard.GhostTransform.position, targetWorldPos) <= GameSettings.TileArrivedTolerance)
             {
                 GhostBlackboard.GhostTransform.position = targetWorldPos;
                 _currentTile = _targetTile;
@@ -55,7 +46,7 @@ namespace CMP.Scripts.AiStates
                 GhostBlackboard.TargetGridPos = _targetTile;
             }
 
-            if (HasLineOfSightToPacman(SightDistance))
+            if (HasLineOfSightToPacman(GameSettings.AiSightDistance))
             {
                 GhostBlackboard.GameManager?.TriggerAllGhostsChase();
             }
@@ -66,8 +57,9 @@ namespace CMP.Scripts.AiStates
             List<Vector2Int> validDirections = new List<Vector2Int>();
             Vector2Int oppositeDirection = -comingDirection;
 
-            foreach (var dir in PossibleDirections)
+            foreach (var direction in GameSettings.DirectionsToCheck)
             {
+                Vector2Int dir = direction.ToVector2Int();
                 Vector2Int neighbor = atTile + dir;
 
                 if (!IsTileWalkable(neighbor)) 

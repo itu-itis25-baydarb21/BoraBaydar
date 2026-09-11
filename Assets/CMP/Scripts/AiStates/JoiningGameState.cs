@@ -20,7 +20,7 @@ namespace CMP.Scripts.AiStates
             {
                 _gateWorldPos = (Vector3)(Vector2)joinGameCell[0];
 
-                _targetWorldPos = new Vector3(_gateWorldPos.x,GhostBlackboard.GhostTransform.transform.position.y, GhostBlackboard.GhostTransform.position.z);
+                _targetWorldPos = new Vector3(_gateWorldPos.x,GhostBlackboard.GhostTransform.position.y, GhostBlackboard.GhostTransform.position.z);
             }
             else
             {
@@ -36,7 +36,7 @@ namespace CMP.Scripts.AiStates
                 GhostBlackboard.Speed * Time.deltaTime
             );
 
-            if (Vector3.Distance(GhostBlackboard.GhostTransform.position, _targetWorldPos) < 0.01f)
+            if (Vector3.Distance(GhostBlackboard.GhostTransform.position, _targetWorldPos) < GameSettings.TileArrivedTolerance)
             {
                 if (!_alignedWithGateX)
                 {
@@ -49,6 +49,9 @@ namespace CMP.Scripts.AiStates
                         Mathf.RoundToInt(_gateWorldPos.x), 
                         Mathf.RoundToInt(_gateWorldPos.y)
                     );
+
+                    GhostBlackboard.GridDirection = Vector2Int.up;
+                    
                     GhostBlackboard.GhostComponent.ChangeState(new ScatterState(GhostBlackboard));
                 }
             }       

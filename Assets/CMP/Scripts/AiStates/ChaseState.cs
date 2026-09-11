@@ -9,21 +9,10 @@ namespace CMP.Scripts.AiStates
         private Vector2Int _targetTile;
         private Vector2Int _currentDirection;
 
-        private const float CatchDistance = 0.4f; 
-        private const float ArrivedTolerance = 0.02f;
-        
-        private const float MaxChaseDuration = 10f;
-        private const float SightLostLimit = 3f;   
         private float _chaseTimer = 0f;
         private float _sightLostTimer = 0f;
 
-        private static readonly Vector2Int[] PossibleDirections = new[]
-        {
-            Vector2Int.up,
-            Vector2Int.left,
-            Vector2Int.down,
-            Vector2Int.right
-        };
+
 
         public ChaseState(GhostBlackboard blackboard) : base(blackboard) { }
 
@@ -51,7 +40,7 @@ namespace CMP.Scripts.AiStates
                     GhostBlackboard.PacmanTransform.position
                 );
 
-                if (distanceToPacman <= CatchDistance)
+                if (distanceToPacman <= GameSettings.CatchDistance)
                 {
                     GhostBlackboard.GameManager?.TriggerGameOver();
                     return;
@@ -70,7 +59,7 @@ namespace CMP.Scripts.AiStates
                 _sightLostTimer = 0f; 
             }
 
-            if (_chaseTimer >= MaxChaseDuration || _sightLostTimer >= SightLostLimit)
+            if (_chaseTimer >= GameSettings.AiMaxChaseDuration || _sightLostTimer >= GameSettings.AiSightLostLimit)
             {
                 ReturnToScatter();
                 return;
@@ -83,7 +72,7 @@ namespace CMP.Scripts.AiStates
                 GhostBlackboard.Speed * Time.deltaTime
             );
 
-            if (Vector3.Distance(GhostBlackboard.GhostTransform.position, targetWorldPos) <= ArrivedTolerance)
+            if (Vector3.Distance(GhostBlackboard.GhostTransform.position, targetWorldPos) <= GameSettings.TileArrivedTolerance)
             {
                 GhostBlackboard.GhostTransform.position = targetWorldPos;
                 _currentTile = _targetTile;
@@ -158,8 +147,9 @@ namespace CMP.Scripts.AiStates
             Vector2Int oppositeDirection = -comingDirection;
             List<Vector2Int> validDirections = new List<Vector2Int>();
 
-            foreach (var dir in PossibleDirections)
+            foreach (var direction in GameSettings.DirectionsToCheck)
             {
+                Vector2Int dir = direction.ToVector2Int();
                 Vector2Int neighbor = atTile + dir;
                 if (IsTileWalkable(neighbor))
                 {

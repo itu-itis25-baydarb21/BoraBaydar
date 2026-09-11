@@ -11,7 +11,6 @@ namespace CMP.Scripts.AiStates
         private Vector2Int _homeCenter;
         private Vector2Int _targetTile;
         private bool _isMovingUp = true;
-        private const float WaitTimeInHouse = 3f;
         public InHouseState(GhostBlackboard blackboard) : base(blackboard)
         {
         }
@@ -37,7 +36,7 @@ namespace CMP.Scripts.AiStates
                 GhostBlackboard.Speed * Time.deltaTime
             );
 
-            if(Vector3.Distance(GhostBlackboard.GhostTransform.position, targetWorldPos) < 0.01f)
+            if(Vector3.Distance(GhostBlackboard.GhostTransform.position, targetWorldPos) < GameSettings.TileArrivedTolerance)
             {
                 if(_isMovingUp)
                 {
