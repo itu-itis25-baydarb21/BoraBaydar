@@ -11,6 +11,11 @@ namespace CMP.Scripts.AiStates
 
         private const float CatchDistance = 0.4f; 
         private const float ArrivedTolerance = 0.02f;
+        
+        private const float MaxChaseDuration = 10f;
+        private const float SightLostLimit = 3f;   
+        private float _chaseTimer = 0f;
+        private float _sightLostTimer = 0f;
 
         private static readonly Vector2Int[] PossibleDirections = new[]
         {
@@ -24,6 +29,9 @@ namespace CMP.Scripts.AiStates
 
         public override void OnEnter()
         {
+            _chaseTimer = 0f;
+            _sightLostTimer = 0f;
+
             _currentTile = GhostBlackboard.CurrentGridPos;
             
             _currentDirection = GhostBlackboard.GridDirection != Vector2Int.zero 
@@ -50,6 +58,24 @@ namespace CMP.Scripts.AiStates
                 }
             }
 
+            _chaseTimer += Time.deltaTime;
+
+            bool canSeePacman = CheckLineOfSightToPacman();
+            if (!canSeePacman)
+            {
+                _sightLostTimer += Time.deltaTime;
+            }
+            else
+            {
+                _sightLostTimer = 0f; 
+            }
+
+            if (_chaseTimer >= MaxChaseDuration || _sightLostTimer >= SightLostLimit)
+            {
+                ReturnToScatter();
+                return;
+            }
+
             Vector3 targetWorldPos = new Vector3(_targetTile.x, _targetTile.y, GhostBlackboard.GhostTransform.position.z);
             GhostBlackboard.GhostTransform.position = Vector3.MoveTowards(
                 GhostBlackboard.GhostTransform.position,
@@ -69,6 +95,54 @@ namespace CMP.Scripts.AiStates
                 _targetTile = _currentTile + _currentDirection;
                 GhostBlackboard.TargetGridPos = _targetTile;
             }
+        }
+
+        private void ReturnToScatter()
+        {
+            GhostBlackboard.GhostComponent.ChangeState(new ScatterState(GhostBlackboard));
+
+            GhostBlackboard.GameManager?.CheckAndResetToScatter();
+        }
+
+        private bool CheckLineOfSightToPacman()
+        {
+            if (GhostBlackboard.PacmanTransform == null) return false;
+
+            Vector2Int pacmanTile = new Vector2Int(
+                Mathf.RoundToInt(GhostBlackboard.PacmanTransform.position.x),
+                Mathf.RoundToInt(GhostBlackboard.PacmanTransform.position.y)
+            );
+
+            if (_currentTile.x != pacmanTile.x && _currentTile.y != pacmanTile.y)
+                return false;
+
+            if (_currentTile.y == pacmanTile.y)
+            {
+                int minX = Mathf.Min(_currentTile.x, pacmanTile.x);
+                int maxX = Mathf.Max(_currentTile.x, pacmanTile.x);
+
+                for (int x = minX + 1; x < maxX; x++)
+                {
+                    if (!IsTileWalkable(new Vector2Int(x, _currentTile.y)))
+                        return false;
+                }
+                return true;
+            }
+
+            if (_currentTile.x == pacmanTile.x)
+            {
+                int minY = Mathf.Min(_currentTile.y, pacmanTile.y);
+                int maxY = Mathf.Max(_currentTile.y, pacmanTile.y);
+
+                for (int y = minY + 1; y < maxY; y++)
+                {
+                    if (!IsTileWalkable(new Vector2Int(_currentTile.x, y)))
+                        return false; 
+                }
+                return true;
+            }
+
+            return false;
         }
 
         private Vector2Int ChooseBestDirectionToPacman(Vector2Int atTile, Vector2Int comingDirection)
