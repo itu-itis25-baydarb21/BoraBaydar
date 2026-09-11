@@ -12,7 +12,7 @@ namespace CMP.Scripts
         public Animator Animator;
         public const string FailTriggerName = "Fail";
         private const string FailAnimationName = "FailAnimation";
-        public float Speed = 5f;
+        public float Speed;
         [SerializeField] private GameObject pacmanVisual;
         [SerializeField] private GridData gridData;
         private List<Vector2Int> _notMoveableCellCords = new List<Vector2Int>();
@@ -20,7 +20,15 @@ namespace CMP.Scripts
         private HashSet<Vector2Int> _notMovableCellCordsSet;
         
 
+        private void Awake()
+        {
+            Speed = 1f / GameSettings.PacmanMovementDuration;
 
+            if(Animator == null)
+            {
+                Animator = GetComponentInChildren<Animator>();
+            }
+        }
         private void Start() 
         {
             if (InputManager == null) 
@@ -73,17 +81,14 @@ namespace CMP.Scripts
                 case Direction.Up:
                     transform.rotation = Quaternion.Euler(0,0,90);
                     pacmanVisual.transform.rotation = Quaternion.Euler(0,0,90);
-                    
                     break;
                 case Direction.Left:
                     transform.rotation = Quaternion.Euler(0,0,180);
                     pacmanVisual.transform.rotation = Quaternion.Euler(0,0,180);
-
                     break;
                 case Direction.Down:
                     transform.rotation = Quaternion.Euler(0,0,270);
                     pacmanVisual.transform.rotation = Quaternion.Euler(0,0,270);
-
                     break;
             }
         }

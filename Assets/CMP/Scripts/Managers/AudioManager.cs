@@ -24,7 +24,6 @@ namespace CMP.Scripts
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
 
-            // Waka ses klibini kaynağa bağla ve döngüye al
             if (wakaSource != null && wakaClip != null)
             {
                 wakaSource.clip = wakaClip;
@@ -80,9 +79,7 @@ namespace CMP.Scripts
         {
             loopSource.Stop();
         }
-
-        // --- WAKA KONTROLLERİ ---
-
+        
         public void StartWaka()
         {
             if (wakaSource != null && !wakaSource.isPlaying)
