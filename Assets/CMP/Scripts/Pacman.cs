@@ -54,13 +54,10 @@ namespace CMP.Scripts
         {
             this.enabled = false;
 
-            if(AudioManager.Instance != null)
+            if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.StopWaka();
-            }
-
-            if(Animator != null)
-            {
+                Animator.speed = 1f; 
                 Animator.SetTrigger(FailTriggerName);
             }
         }
@@ -93,40 +90,48 @@ namespace CMP.Scripts
 
         private void MovePacman()
         {
-            if (_currentMoveDirection == Direction.None && _desiredMoveDirection == Direction.None) return;
-            
+            if (_currentMoveDirection == Direction.None && _desiredMoveDirection == Direction.None)
+            {
+                if (Animator != null) Animator.speed = 0f;
+                if (AudioManager.Instance != null) AudioManager.Instance.StopWaka();
+                return;
+            }
+
             Vector3 finalTargetPosition = (Vector3)(Vector2)_targetPosition;
             bool isAtCenter = Vector3.Distance(transform.position, finalTargetPosition) < 0.01f;
 
-            if (isAtCenter) 
+            if (isAtCenter)
             {
                 Vector2Int pos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
-                
                 Vector2Int desiredVector = _desiredMoveDirection.ToVector2Int();
                 Vector2Int desiredNextCell = pos + desiredVector;
-                
-                bool isDesiredValid = desiredNextCell.x >= 0 && desiredNextCell.x < gridData.Width && desiredNextCell.y >= 0 && desiredNextCell.y < gridData.Height && !_notMovableCellCordsSet.Contains(desiredNextCell);
+
+                bool isDesiredValid = desiredNextCell.x >= 0 && desiredNextCell.x < gridData.Width &&
+                                    desiredNextCell.y >= 0 && desiredNextCell.y < gridData.Height &&
+                                    !_notMovableCellCordsSet.Contains(desiredNextCell);
 
                 if (_desiredMoveDirection != Direction.None && isDesiredValid)
                 {
                     _currentMoveDirection = _desiredMoveDirection;
-                    UpdateFacingDirection(); 
+                    UpdateFacingDirection();
                     _targetPosition = desiredNextCell;
                 }
-                else 
+                else
                 {
                     Vector2Int currentVector = _currentMoveDirection.ToVector2Int();
                     Vector2Int currentNextCell = pos + currentVector;
-                    
-                    bool isCurrentValid = currentNextCell.x >= 0 && currentNextCell.x < gridData.Width && currentNextCell.y >= 0 && currentNextCell.y < gridData.Height && !_notMovableCellCordsSet.Contains(currentNextCell);
+
+                    bool isCurrentValid = currentNextCell.x >= 0 && currentNextCell.x < gridData.Width &&
+                                        currentNextCell.y >= 0 && currentNextCell.y < gridData.Height &&
+                                        !_notMovableCellCordsSet.Contains(currentNextCell);
 
                     if (isCurrentValid)
                     {
-                        _targetPosition = currentNextCell; 
+                        _targetPosition = currentNextCell;
                     }
                     else
                     {
-                        _targetPosition = pos; 
+                        _targetPosition = pos;
                         _currentMoveDirection = Direction.None;
                     }
                 }
@@ -134,14 +139,18 @@ namespace CMP.Scripts
             }
 
             Vector3 prevPosition = transform.position;
-
             transform.position = Vector3.MoveTowards(transform.position, finalTargetPosition, Speed * Time.deltaTime);
 
             bool isActuallyMoving = (transform.position - prevPosition).sqrMagnitude > 0.00001f;
 
-            if(AudioManager.Instance != null)
+            if (Animator != null)
             {
-                if(isActuallyMoving)
+                Animator.speed = isActuallyMoving ? 1f : 0f;
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                if (isActuallyMoving)
                 {
                     AudioManager.Instance.StartWaka();
                 }
