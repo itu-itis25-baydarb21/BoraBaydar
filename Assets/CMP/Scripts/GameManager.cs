@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using CMP.Scripts.AiStates;
 using CMP.Scripts.Helper;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
+using Unity.VisualScripting;
 
 namespace CMP.Scripts
 {
@@ -25,8 +28,15 @@ namespace CMP.Scripts
 
         public GameMode CurrentGameMode => _gameMode;
 
+        [SerializeField] private GameObject gameOverPanel;
+
         private void Start()
         {
+            if(gameOverPanel != null)
+            {
+                gameOverPanel.SetActive(false);
+            }
+
             gridData = AssetDatabase.Instance.GridData;
             _pacman = Instantiate(AssetDatabase.Instance.PacmanPrefab);
             _inputManager = Instantiate(AssetDatabase.Instance.InputManagerPrefab);
@@ -45,6 +55,11 @@ namespace CMP.Scripts
 
             GetGhostSpawnPoints();
             AdjustGhostSpawnPoints();
+
+            if(AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayStartSequence();
+            }
         }
 
         private void CreateBackground(GridData data)
@@ -119,6 +134,11 @@ namespace CMP.Scripts
 
             _gameMode = GameMode.Chase;
 
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySiren(true);
+            }
+
             foreach (var ghost in _ghosts)
             {
                 if (ghost.CurrentState is ScatterState)
@@ -134,6 +154,11 @@ namespace CMP.Scripts
 
             _gameMode = GameMode.GameOver;
 
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayDieSound(); 
+            }
+
             if (_pacman != null)
             {
                 _pacman.PlayFailAnimation();
@@ -142,12 +167,32 @@ namespace CMP.Scripts
             if (_inputManager != null)
             {
                 _inputManager.enabled = false;
+                _inputManager.gameObject.SetActive(false);
             }
 
             foreach (var ghost in _ghosts)
             {
                 ghost.enabled = false;
+                ghost.gameObject.SetActive(false);
             }
+
+            StartCoroutine(ShowGameOverPanelRoutine());
+        }
+
+        private IEnumerator ShowGameOverPanelRoutine()
+        {
+            yield return new WaitForSeconds(1.5f);
+
+            if (gameOverPanel != null)
+            {
+                gameOverPanel.SetActive(true);
+            }
+        }
+
+        public void OnRestartButtonClicked()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(activeScene.buildIndex);
         }
     }
 }
